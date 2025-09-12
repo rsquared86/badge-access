@@ -19,6 +19,18 @@ def createPerson(card_uid, first_name, last_name, email):
     finally:
         conn.close()
 
+def updatePersonByCardUID(card_uid, first_name, last_name, email):
+    conn = initDb()
+    cur = conn.cursor()
+    cur.execute("UPDATE Person SET first_name=?, last_name=?, email=? WHERE card_uid=?", 
+                (first_name, last_name, email, card_uid))
+    conn.commit()
+    if cur.rowcount > 0:
+        print(f"✅ Person with card {card_uid} updated successfully")
+    else:
+        print(f"⚠️ No person found with card UID {card_uid}")
+    conn.close()
+
 def updatePersonById(person_id, first_name, last_name, email):
     conn = initDb()
     cur = conn.cursor()
@@ -31,6 +43,15 @@ def updatePersonById(person_id, first_name, last_name, email):
         print(f"⚠️ No person found with ID {person_id}")
     conn.close()
 
+def getPersonByCardUID(card_uid):
+    conn = initDb()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM Person WHERE card_uid=?", (card_uid,))
+    person = cur.fetchone()
+    person = dict(person) if person else None
+    conn.close()
+    return person
+
 def getPersonById(person_id):
     conn = initDb()
     cur = conn.cursor()
@@ -39,6 +60,22 @@ def getPersonById(person_id):
     person = dict(person) if person else None
     conn.close()
     return person
+
+def deletePersonByCardUID(card_uid):
+    conn = initDb()
+    cur = conn.cursor()
+    # First get person details for confirmation
+    cur.execute("SELECT first_name, last_name FROM Person WHERE card_uid=?", (card_uid,))
+    person = cur.fetchone()
+    
+    if person:
+        person_name = f"{person['first_name']} {person['last_name']}"
+        cur.execute("DELETE FROM Person WHERE card_uid=?", (card_uid,))
+        conn.commit()
+        print(f"✅ {person_name} (Card: {card_uid}) deleted successfully")
+    else:
+        print(f"⚠️ No person found with card UID {card_uid}")
+    conn.close()
 
 def deletePersonById(person_id):
     conn = initDb()

@@ -1,10 +1,10 @@
 #Badge Access Application
 import sqlite3
 from menu import showAppMenu, returnToMenu, get_input
-from person import createPerson, updatePersonById, getPersonById, deletePersonById, showAllPersons
+from person import createPerson, updatePersonByCardUID, getPersonByCardUID, deletePersonByCardUID, showAllPersons
 from Schema_conn import initDb
 from buildings import createBldg, updateBldg, deleteBldg, getBldg
-#from access import addBuildingAccess, checkBuildingAccess
+from access import checkAccess, addAccess
 
 #Display the menu on startup
 showAppMenu()
@@ -25,25 +25,28 @@ def menuSelection(menuOption):
             createPerson(card_uid, first_name, last_name, email)
             returnToMenu(showAppMenu, menuSelection)
         case "2":
-            #Get person id and print the person data from the db
-            personId = input("Enter person id: ")
-            print(getPersonById(personId))
+            #Get person by card UID and print the person data from the db
+            card_uid = get_input("Enter card UID: ")
+            person = getPersonByCardUID(card_uid)
+            if person:
+                print(person)
+            else:
+                print(f"No person found with card UID {card_uid}")
             returnToMenu(showAppMenu, menuSelection)
         case "3":
             #update a person
-            person_id = get_input("Enter the person ID to update: ", int)
+            card_uid = get_input("Enter the card UID to update: ")
             first_name = get_input("Enter the new first name: ")
             last_name = get_input("Enter the new last name: ")
             email = get_input("Enter the new email (or leave blank): ")
             if email.strip() == "":
                 email = None
-            updatePersonById(person_id, first_name, last_name, email)
+            updatePersonByCardUID(card_uid, first_name, last_name, email)
             returnToMenu(showAppMenu, menuSelection)
         case "4":
             #delete a person
-            personId = get_input("Enter the person ID to delete: ", int)
-            deletePersonById(personId)
-            print(f"Person with ID {personId} has been deleted.")
+            card_uid = get_input("Enter the card UID to delete: ")
+            deletePersonByCardUID(card_uid)
             returnToMenu(showAppMenu, menuSelection)
         case "5":
             #create a building
@@ -74,15 +77,15 @@ def menuSelection(menuOption):
             returnToMenu(showAppMenu, menuSelection)
         case "9":
             #check building access
-            person_id = get_input("Enter person ID: ", int)
+            card_uid = get_input("Enter card UID: ")
             building_id = get_input("Enter building ID: ", int)
-            #checkBuildingAccess(person_id, building_id)
+            checkAccess(card_uid, building_id)
             returnToMenu(showAppMenu, menuSelection)
         case "10":
             #add building access
-            person_id = get_input("Enter person ID: ", int)
+            card_uid = get_input("Enter card UID: ")
             building_id = get_input("Enter building ID: ", int)
-            #addBuildingAccess(person_id, building_id)
+            addAccess(card_uid, building_id)
             returnToMenu(showAppMenu, menuSelection)
         case "11":
             #reports menu

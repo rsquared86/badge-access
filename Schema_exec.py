@@ -40,18 +40,19 @@ def extend_schema():
 
     CREATE TABLE IF NOT EXISTS Check_in (
       check_id    INTEGER PRIMARY KEY AUTOINCREMENT,
-      person_id   INTEGER NOT NULL,
+      card_uid    INTEGER NOT NULL,
       building_id INTEGER NOT NULL,
       ap_id       INTEGER NOT NULL,
       tstamp      DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (person_id)                REFERENCES Person(person_id),
+      AccessGranted INTEGER NOT NULL,  -- 1 for granted, 0 for denied
+      FOREIGN KEY (card_uid)                REFERENCES Person(card_uid),
       FOREIGN KEY (building_id, ap_id)       REFERENCES AccessPoints(building_id, ap_id)
     );
                       
     CREATE TABLE Person_bldg_access (
-      person_id   INTEGER,
+      card_uid   INTEGER,
       building_id INTEGER,
-      PRIMARY KEY (person_id, building_id)
+      PRIMARY KEY (card_uid, building_id)
     );
     """)
 
