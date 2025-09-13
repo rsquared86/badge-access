@@ -5,7 +5,7 @@ from person import createPerson, updatePersonByCardUID, getPersonByCardUID, dele
 from Schema_conn import initDb
 from buildings import createBldg, updateBldg, deleteBldg, getBldg
 from access import checkAccess, addAccess
-
+from reports import denial_report, most_checkins_by_building, most_checkins_by_date, most_checkins_by_date_with_prompt, most_checkins_by_building_with_prompt, denial_report_with_prompt
 #Display the menu on startup
 showAppMenu()
 
@@ -90,13 +90,24 @@ def menuSelection(menuOption):
         case "11":
             #reports menu
             print("\n**** Reports ****")
-            print("1. Show all persons")
-            print("2. Show all buildings")
-            print("3. Show all access permissions")
+            print("1. Most Checkins by Date")
+            print("2. Most Checkins by Building")
+            print("3. Denial Report")
             report_choice = get_input("Select report option: ")
-            
-            print("Invalid report option")
-            returnToMenu(showAppMenu, menuSelection)
+
+            match report_choice:
+                case "1":
+                    most_checkins_by_date_with_prompt()
+                    returnToMenu(showAppMenu, menuSelection)
+                case "2":
+                    most_checkins_by_building_with_prompt()
+                    returnToMenu(showAppMenu, menuSelection)
+                case "3":
+                    denial_report_with_prompt()
+                    returnToMenu(showAppMenu, menuSelection)
+                case _:
+                    print("Invalid report option")
+                    returnToMenu(showAppMenu, menuSelection)
         case "12":
             #exit
             print("Thank you for using the Building Access Application. Goodbye!")
