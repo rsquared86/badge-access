@@ -2,32 +2,31 @@ import sqlite3
 from Schema_conn import initDb
 
 #Check if person has access to building using card_uid and log check-in
-def checkAccess(card_uid, building_id):
+def checkAccess(card_uid, building_id, ap_id=1):
     conn = initDb()
     cur = conn.cursor()
-    # First get the person_id from card_uid
-    cur.execute("SELECT person_id, first_name, last_name FROM Person WHERE card_uid=?", (card_uid,))
+    # Get person details using card_uid
+    cur.execute("SELECT first_name, last_name FROM Person WHERE card_uid=?", (card_uid,))
     person = cur.fetchone()
     
     if not person:
         conn.close()
         return print(f"❌ No person found with card UID: {card_uid}")
     
-    person_id = person['person_id']
     person_name = f"{person['first_name']} {person['last_name']}"
     
-    # Check access using person_id
-    cur.execute("SELECT 1 FROM Person_bldg_access WHERE person_id=? AND building_id=?", (person_id, building_id))
+    # Check access using card_uid directly
+    cur.execute("SELECT 1 FROM Person_bldg_access WHERE card_uid=? AND building_id=?", (card_uid, building_id))
     has_access = cur.fetchone() is not None
     
     # Set AccessGranted based on access result (1 for granted, 0 for denied)
     access_granted = 1 if has_access else 0
     
-    # Log the access attempt to check_in table with AccessGranted status
+    # Log the access attempt to Check_in table with AccessGranted status
     try:
         cur.execute(
-            "INSERT INTO check_in (person_id, building_id, ap_id, AccessGranted) VALUES (?, ?, NULL, ?)",
-            (person_id, building_id, access_granted)
+            "INSERT INTO Check_in (card_uid, building_id, ap_id, AccessGranted) VALUES (?, ?, ?, ?)",
+            (card_uid, building_id, ap_id, access_granted)
         )
         conn.commit()
     except sqlite3.IntegrityError as e:
@@ -52,21 +51,20 @@ def addAccess(card_uid, building_id):
             "PRAGMA foreign_keys = ON;"
         )
         
-        # First get the person_id from card_uid
-        cur.execute("SELECT person_id, first_name, last_name FROM Person WHERE card_uid=?", (card_uid,))
+        # Get person details using card_uid
+        cur.execute("SELECT first_name, last_name FROM Person WHERE card_uid=?", (card_uid,))
         person = cur.fetchone()
         
         if not person:
             print(f"❌ No person found with card UID: {card_uid}")
             return
         
-        person_id = person['person_id']
         person_name = f"{person['first_name']} {person['last_name']}"
         
-        # Add access using person_id
+        # Add access using card_uid directly
         cur.execute(
-            "INSERT INTO Person_bldg_access (person_id, building_id) VALUES (?, ?)",
-            (person_id, building_id)
+            "INSERT INTO Person_bldg_access (card_uid, building_id) VALUES (?, ?)",
+            (card_uid, building_id)
         )
         conn.commit()
         print(f"✅ Access added for {person_name} (Card: {card_uid}) to building {building_id}")
