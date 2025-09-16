@@ -6,6 +6,7 @@ from Schema_conn import initDb
 from buildings import createBldg, updateBldg, deleteBldg, getBldg
 from access import checkAccess, addAccess
 from reports import denial_report, most_checkins_by_building, most_checkins_by_date, most_checkins_by_date_with_prompt, most_checkins_by_building_with_prompt, denial_report_with_prompt
+from charts import building_access_bar_chart, access_time_heatmap, access_trends_by_building, create_all_charts
 #Display the menu on startup
 showAppMenu()
 
@@ -88,12 +89,18 @@ def menuSelection(menuOption):
             addAccess(card_uid, building_id)
             returnToMenu(showAppMenu, menuSelection)
         case "11":
-            #reports menu
-            print("\n**** Reports ****")
+            #reports and charts menu
+            print("\n**** Reports & Analytics ****")
+            print("--- Reports ---")
             print("1. Most Checkins by Date")
             print("2. Most Checkins by Building")
             print("3. Denial Report")
-            report_choice = get_input("Select report option: ")
+            print("\n--- Charts ---")
+            print("4. Building Access Bar Chart (Last 2 Weeks)")
+            print("5. Access Time Heatmap")
+            print("6. Access Trends by Building")
+            print("7. Generate All Charts")
+            report_choice = get_input("Select option (1-7): ")
 
             match report_choice:
                 case "1":
@@ -105,8 +112,27 @@ def menuSelection(menuOption):
                 case "3":
                     denial_report_with_prompt()
                     returnToMenu(showAppMenu, menuSelection)
+                case "4":
+                    save = get_input("Save chart to file? (y/n): ").strip().lower() == 'y'
+                    building_access_bar_chart('building_access_2weeks.png' if save else None)
+                    returnToMenu(showAppMenu, menuSelection)
+                case "5":
+                    save = get_input("Save chart to file? (y/n): ").strip().lower() == 'y'
+                    access_time_heatmap('access_time_heatmap.png' if save else None)
+                    returnToMenu(showAppMenu, menuSelection)
+                case "6":
+                    building = get_input("Enter building name (or press Enter for all buildings): ").strip()
+                    building = building if building else None
+                    save = get_input("Save chart to file? (y/n): ").strip().lower() == 'y'
+                    filename = f"trends_{building.replace(' ', '_').lower()}.png" if save and building else "access_trends.png" if save else None
+                    access_trends_by_building(building, filename)
+                    returnToMenu(showAppMenu, menuSelection)
+                case "7":
+                    save = get_input("Save all charts to files? (y/n): ").strip().lower() == 'y'
+                    create_all_charts(save)
+                    returnToMenu(showAppMenu, menuSelection)
                 case _:
-                    print("Invalid report option")
+                    print("Invalid option. Please select 1-7.")
                     returnToMenu(showAppMenu, menuSelection)
         case "12":
             #exit

@@ -1,0 +1,16 @@
+# Badge Access Application Requirements
+# Install with: pip install -r requirements.txt
+
+# Data Analysis and Manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# PDF Generation for Reports
+reportlab>=4.0.0
+
+# Data Visualization
+plotnine>=0.12.0
+matplotlib>=3.7.0
+
+# Optional but recommended for better performance
+python-dateutil>=2.8.0
